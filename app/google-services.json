@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "218982282648",
+    "firebase_url": "https://pegion-822f1.firebaseio.com",
+    "project_id": "pegion-822f1",
+    "storage_bucket": "pegion-822f1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218982282648:android:cce62d3aa07421b3",
+        "android_client_info": {
+          "package_name": "com.example.dell.pegion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218982282648-aa14nddevn1304osf507aucbqlrng963.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dell.pegion",
+            "certificate_hash": "8d3d2cf6e5d3006090950d28aae67f7425035ca0"
+          }
+        },
+        {
+          "client_id": "218982282648-dokeuhncu6ftdtkkagh5ptv16eatv3jp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVcTpwv-5rZXrgtwk8QaFU9XjwezuII_Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218982282648-dokeuhncu6ftdtkkagh5ptv16eatv3jp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

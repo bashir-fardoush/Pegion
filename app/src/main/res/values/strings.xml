@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Pegion</string>
+    <string name="register_option_text">No Account? Register Here!</string>
+    <string name="log_in_option_text">Log In</string>
+    <string name="register_sample_text">Create a new account</string>
+    <string name="hint_email">Enter email</string>
+    <string name="hint_password">Enter password</string>
+    <string name="hint_name">Enter your name</string>
+    <string name="register_login_option_text">Already have an account? Login here</string>
+    <string name="logIn_sample_text">Log in to your Account</string>
+    <string name="email_required">Email required</string>
+    <string name="password_length_constraint">Atleast 6 character required</string>
+    <string name="password_not_matched">Password not matched</string>
 </resources>

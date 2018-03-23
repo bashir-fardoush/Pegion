@@ -1,5 +1,6 @@
 package com.example.dell.pegion;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -32,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private android.support.v7.widget.Toolbar regToolbar;
 
     private AlertDialog.Builder builder;
+    private ProgressDialog registerProgressdialog;
 
 
     @Override
@@ -89,6 +91,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
+        registerProgressdialog = new ProgressDialog(this);
+        registerProgressdialog.setTitle("Creating your Account");
+        registerProgressdialog.setCancelable(false);
+        registerProgressdialog.setIndeterminate(true);
+
 
     }
 
@@ -132,6 +139,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         else {
             register(email,password);
+            registerProgressdialog.show();
         }
     }
 
@@ -139,15 +147,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
+                registerProgressdialog.dismiss();
                 Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
                 Log.d("userID",mAuth.getCurrentUser().getUid());
-               // mAuth.signOut();
                 verifyUserEmail();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(RegisterActivity.this, "Account creating failed.", Toast.LENGTH_SHORT).show();
+                registerProgressdialog.dismiss();
+                Toast.makeText(RegisterActivity.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
                 Log.d("registerAct",e.getMessage());
             }
         });

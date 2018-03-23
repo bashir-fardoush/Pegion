@@ -1,5 +1,6 @@
 package com.example.dell.pegion;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -25,6 +27,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     private Button logInBtn;
     private TextView registerTV;
     private android.support.v7.widget.Toolbar logInToolbar;
+    private ProgressDialog logInProgressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,12 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         registerTV = findViewById(R.id.logIn_register_Option);
         logInBtn.setOnClickListener(this);
         registerTV.setOnClickListener(this);
+
+        logInProgressDialog = new ProgressDialog(this);
+        logInProgressDialog.setTitle("Logging In");
+        logInProgressDialog.setCancelable(false);
+        logInProgressDialog.setIndeterminate(true);
+
     }
 
     @Override
@@ -53,6 +62,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.logIn_btn:
+                logInProgressDialog.show();
                 logIn();
                 break;
             case R.id.logIn_register_Option:
@@ -63,13 +73,14 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         }
     }
     private void logIn(){
-        //show a round loading progressbar
+
         String email= emailInputLayout.getEditText().getText().toString();
         String password= passwordInputLayout.getEditText().getText().toString();
 
         mAuth.signInWithEmailAndPassword(email,password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
+                logInProgressDialog.dismiss();
                 Intent startIntent = new Intent(LogInActivity.this,StartActivity.class);
                 startActivity(startIntent);
                 finish();
@@ -77,7 +88,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LogInActivity.this, "Login failed:  "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                logInProgressDialog.dismiss();
+                Toast.makeText(LogInActivity.this, "Login failed:  "+e.getMessage(), Toast.LENGTH_LONG).show();
                 Log.d("loginAct_Failed",e.getMessage());
             }
         });

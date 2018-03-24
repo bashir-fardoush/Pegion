@@ -75,7 +75,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Toast.makeText(RegisterActivity.this, "Congratulation, Your Email Verified", Toast.LENGTH_LONG).show();
                             Log.d("registerAct","Email Verified");
                             mAuth.signOut();
-                            startActivity(new Intent(RegisterActivity.this, LogInActivity.class));
+                            startActivity(new Intent(RegisterActivity.this, LogInActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                             finish();
                         }
                         dialogInterface.cancel();
@@ -116,6 +116,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.register_login_option:
                 Intent logInIntent = new Intent(this, LogInActivity.class);
+                logInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(logInIntent);
                 finish();
                 break;

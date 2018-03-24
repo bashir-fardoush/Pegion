@@ -1,38 +1,45 @@
 package com.example.dell.pegion;
 
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import javax.security.auth.login.LoginException;
+public class HomeActivity extends AppCompatActivity {
 
-public class StartActivity extends AppCompatActivity {
 
-    private TextView sampleTV;
     private FirebaseAuth mAuth;
     private FirebaseUser user=null;
     private android.support.v7.widget.Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private SectionPagerAdapter pagerAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_home);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        toolbar = findViewById(R.id.start_activity_toolbar);
+        toolbar = findViewById(R.id.home_activity_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
-        sampleTV = findViewById(R.id.sampleTextId);
-        sampleTV.setText("On Start Activity");
+        tabLayout = findViewById(R.id.home_tab_layout);
+        viewPager = findViewById(R.id.tab_pager);
+
+        pagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(pagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+
+
     }
 
     @Override
@@ -43,7 +50,7 @@ public class StartActivity extends AppCompatActivity {
         }else if (!user.isEmailVerified()){
            sendToRegister(true);
         }else {
-            sampleTV.setText("User Email verified");
+
         }
 
     }

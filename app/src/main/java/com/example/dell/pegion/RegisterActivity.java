@@ -22,9 +22,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private String childUsers = "users";
+    //private String childUserId =
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private TextInputLayout nameIL,emailIL,passwordIL,confirmPassIL;
@@ -34,6 +40,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private AlertDialog.Builder builder;
     private ProgressDialog registerProgressdialog;
+
+    private DatabaseReference databaseReference = null;
 
 
     @Override
@@ -50,6 +58,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         nameIL = findViewById(R.id.register_name_IL);
         emailIL = findViewById(R.id.register_email_IL);
@@ -139,19 +148,39 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             confirmPassIL.getEditText().setError(getString(R.string.password_not_matched));
         }
         else {
-            register(email,password);
+            register(name,email,password);
             registerProgressdialog.show();
         }
     }
 
-    private void register(String email, String password) {
+    private void register(final String name, String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                registerProgressdialog.dismiss();
-                Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
-                Log.d("userID",mAuth.getCurrentUser().getUid());
-                verifyUserEmail();
+                String userID = mAuth.getCurrentUser().getUid();
+                DatabaseReference reference = databaseReference.child(childUsers).child(userID);
+                HashMap<String, String> userMap = new HashMap<>();
+                userMap.put("name",name);
+                userMap.put("image","default_image_link");
+                userMap.put("thumb_image","default_link");
+                userMap.put("status","HI i am using Pegion");
+
+                reference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()){
+                            registerProgressdialog.dismiss();
+                            Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
+                            Log.d("userID",mAuth.getCurrentUser().getUid());
+                            verifyUserEmail();
+                        }
+                        else {
+                            Toast.makeText(RegisterActivity.this, "failed to store info", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

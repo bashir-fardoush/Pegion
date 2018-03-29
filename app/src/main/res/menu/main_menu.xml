@@ -3,9 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menu_account_settings_btn"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/account_settings"/>
+    <item
         android:id="@+id/menu_chat_room_btn"
         android:icon="@drawable/icon_chat_room"
-        android:title="Chat Room" />
+        android:title="@string/chat_room" />
     <item
         android:id="@+id/menu_log_out_btn"
         android:title="Log Out"

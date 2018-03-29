@@ -66,13 +66,18 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case R.id.menu_chat_room_btn:
+                Toast.makeText(this, "Enter into chat room", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.menu_account_settings_btn:
+                Intent settingsIntent = new Intent(this, AccountSettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
             case R.id.menu_log_out_btn:
                 mAuth.signOut();
                 sendToLogIn(true);
                 break;
-            case R.id.menu_chat_room_btn:
-                Toast.makeText(this, "Enter into chat room", Toast.LENGTH_LONG).show();
-                break;
+
         }
         return true;
     }

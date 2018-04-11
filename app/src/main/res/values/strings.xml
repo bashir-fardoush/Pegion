@@ -20,4 +20,5 @@
     <string name="change_status">Change Status</string>
     <string name="account_settings">Account Settings</string>
     <string name="chat_room">Chat Room</string>
+    <string name="save">save</string>
 </resources>

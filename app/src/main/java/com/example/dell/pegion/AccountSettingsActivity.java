@@ -1,11 +1,14 @@
 package com.example.dell.pegion;
 
+import android.content.Intent;
 import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AccountSettingsActivity extends AppCompatActivity {
+public class AccountSettingsActivity extends AppCompatActivity implements View.OnClickListener {
     private CircleImageView userImage;
     private TextView userNameTV, userStatusTV;
     private Button statusChangeBtn,imageChangeBtn;
@@ -26,6 +29,9 @@ public class AccountSettingsActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private String userId = null;
+    private String userStatus = null;
+    private String userName = null;
+    public static final String USER_STATUS_KEY ="user status";
 
     private ContentLoadingProgressBar loadingProgressBar;
 
@@ -47,6 +53,9 @@ public class AccountSettingsActivity extends AppCompatActivity {
         imageChangeBtn = findViewById(R.id.image_change_btn);
         statusChangeBtn = findViewById(R.id.status_change_btn);
 
+        imageChangeBtn.setOnClickListener(this);
+        statusChangeBtn.setOnClickListener(this);
+
 
             loadingProgressBar = new ContentLoadingProgressBar(this);
 
@@ -54,8 +63,8 @@ public class AccountSettingsActivity extends AppCompatActivity {
             childReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String userName = dataSnapshot.child("name").getValue().toString();
-                String userStatus = dataSnapshot.child("status").getValue().toString();
+                 userName = dataSnapshot.child("name").getValue().toString();
+                 userStatus = dataSnapshot.child("status").getValue().toString();
                 Log.d("settings_dataload","Success");
                 updateUI(userName, userStatus);
             }
@@ -70,5 +79,23 @@ public class AccountSettingsActivity extends AppCompatActivity {
     private void updateUI(String userName, String userStatus) {
         userNameTV.setText(userName);
         userStatusTV.setText(userStatus);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()){
+            case R.id.image_change_btn:
+                // change image here
+                Toast.makeText(this, "Image change will be added soon", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.status_change_btn:
+                Intent intent = new Intent(this, StatusChangeActivity.class);
+                intent.putExtra(USER_STATUS_KEY,userStatus);
+                startActivity(intent);
+                
+                break;
+        }
+
     }
 }

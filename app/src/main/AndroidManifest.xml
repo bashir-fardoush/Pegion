@@ -22,7 +22,8 @@
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".LogInActivity" />
-        <activity android:name=".AccountSettingsActivity"></activity>
+        <activity android:name=".AccountSettingsActivity" />
+        <activity android:name=".StatusChangeActivity"></activity>
     </application>
 
 </manifest>

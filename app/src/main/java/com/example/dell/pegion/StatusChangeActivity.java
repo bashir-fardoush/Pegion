@@ -2,6 +2,7 @@ package com.example.dell.pegion;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -77,6 +78,11 @@ public class StatusChangeActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.status_save_btn:
+                if (!Utils.isConnected(getApplicationContext())){
+                    Toast.makeText(this, R.string.no_connection, Toast.LENGTH_SHORT).show();
+                    break;
+                }
+
 
 
                 status = statusInputLayout.getEditText().getText().toString();

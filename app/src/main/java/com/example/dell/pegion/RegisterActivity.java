@@ -71,6 +71,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         logInTV.setOnClickListener(this);
 
         builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
         builder.setTitle("Verify Email");
         builder.setMessage("A verification mail sent to your email, please follow the mail. Be patient it may take some while");
         builder.setPositiveButton("Refresh", new DialogInterface.OnClickListener() {
@@ -161,8 +162,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 DatabaseReference reference = databaseReference.child(childUsers).child(userID);
                 HashMap<String, String> userMap = new HashMap<>();
                 userMap.put("name",name);
-                userMap.put("image","default_image_link");
-                userMap.put("thumb_image","default_link");
+                userMap.put("imageUrl","default_image_link");
+                userMap.put("thumbImageUrl","default_link");
                 userMap.put("status","HI i am using Pegion");
 
                 reference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {

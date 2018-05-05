@@ -8,7 +8,10 @@ import android.net.NetworkInfo;
 /**
  * Created by DELL on 5/4/2018.
  */
-
+/**
+ * 1. remember image cropper library and progourd problem: -keep class android.support.v7.widget.** { *; }
+ *2. remember picasso image loading library for proguard
+ * */
 public class Utils {
 
     public static boolean isConnected( Context context){

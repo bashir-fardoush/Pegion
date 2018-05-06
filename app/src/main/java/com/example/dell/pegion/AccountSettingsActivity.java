@@ -2,8 +2,10 @@ package com.example.dell.pegion;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -39,11 +41,20 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.attribute.FileAttribute;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class AccountSettingsActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int GALLERY_PICK_CODE = 101;
-    private static final String TAG ="AccountSettingsActivity" ;
+    private static final String TAG ="tag_AS_Activity" ;
     private CircleImageView profileIV;
     private TextView userNameTV, userStatusTV;
     private Button statusChangeBtn,imageChangeBtn;
@@ -115,7 +126,10 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
     private void updateUI(String userName, String userStatus,String profileImageUrl) {
         userNameTV.setText(userName);
         userStatusTV.setText(userStatus);
-        Picasso.get().load(profileImageUrl).into(profileIV);
+        if (profileImageUrl != null){
+            Picasso.get().load(profileImageUrl).into(profileIV);
+        }
+
 
     }
 
@@ -224,18 +238,66 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
 
 
     }
+    private byte[] getCompressedImageBytes(Uri imageUri){
+        Bitmap compressedImageBitmap = null;
+        File file = new File(imageUri.getPath());
 
-    private void uploadImage(Uri imageUri) {
+        try {
+            compressedImageBitmap = new Compressor(this)
+                    .setMaxHeight(200)
+                    .setMaxWidth(200)
+                    .setQuality(70)
+                    .compressToBitmap(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG,"compress failed");
+        }
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        compressedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        final byte[] data = baos.toByteArray();
+        return data;
+    }
+
+    private void uploadImage(Uri imageUri)  {
+
+        final byte[] data = getCompressedImageBytes(imageUri);
+
+        if (data == null){
+            Toast.makeText(this, "Unable to process image for uploading", Toast.LENGTH_SHORT).show();
+           return;
+        }
+
 
         progressDialog.show();
-        StorageReference profileImagePath = profileImageRef.child("pegion").child(userId).child("profile_images").child("profile_image.jpg");
+        final StorageReference profileImagePath = profileImageRef.child("pegion").child(userId).child("profile_images").child("profile_image.jpg");
+        final StorageReference profileThumbImagePath = profileImageRef.child("pegion").child(userId).child("profile_images").child("thumb_image.jpg");
+
         profileImagePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
            @Override
            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                if (task.isSuccessful()){
-                   Toast.makeText(AccountSettingsActivity.this, "Upload Successfull",Toast.LENGTH_LONG).show();
-                  String downloadUri = String.valueOf(task.getResult().getDownloadUrl());
-                   saveUriInDatabase(downloadUri);
+
+                  Toast.makeText(AccountSettingsActivity.this, "Upload Successfull",Toast.LENGTH_LONG).show();
+                  final String profileDownloadUrl = String.valueOf(task.getResult().getDownloadUrl());
+
+                  profileThumbImagePath.putBytes(data).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                      @Override
+                      public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                          if (thumb_task.isSuccessful()){
+                              String thumbDownloadUri = thumb_task.getResult().getDownloadUrl().toString();
+                              saveUriInDatabase(profileDownloadUrl,thumbDownloadUri);
+                          }
+                          else {
+                              progressDialog.dismiss();
+                              String errorMsg = thumb_task.getException().getMessage();
+                              Log.d(TAG," thumb Image Upload failed\n"+errorMsg);
+                              Toast.makeText(AccountSettingsActivity.this, "Upload failed", Toast.LENGTH_LONG).show();
+                          }
+                      }
+                  });
+
                }else {
                    progressDialog.dismiss();
                    String errorMsg = task.getException().getMessage();
@@ -246,9 +308,13 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
        });
     }
 
-    private void saveUriInDatabase(String downloadUri) {
+    private void saveUriInDatabase(String profileDownloadUrl,String thumbDownloadUri) {
 
-        childReference.child("imageUrl").setValue(downloadUri).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Map<String,String> map = new HashMap<>();
+        map.put("imageUrl",profileDownloadUrl);
+        map.put("thumbImageUrl",thumbDownloadUri);
+
+        childReference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 

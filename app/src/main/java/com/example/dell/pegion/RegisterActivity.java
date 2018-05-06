@@ -160,11 +160,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onSuccess(AuthResult authResult) {
                 String userID = mAuth.getCurrentUser().getUid();
                 DatabaseReference reference = databaseReference.child(childUsers).child(userID);
+               // String nullValue = null;
                 HashMap<String, String> userMap = new HashMap<>();
                 userMap.put("name",name);
-                userMap.put("imageUrl","default_image_link");
-                userMap.put("thumbImageUrl","default_link");
-                userMap.put("status","HI i am using Pegion");
+                userMap.put("imageUrl",null);
+                userMap.put("thumbImageUrl",null);
+                userMap.put("status","Hi, i am using Pegion");
 
                 reference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

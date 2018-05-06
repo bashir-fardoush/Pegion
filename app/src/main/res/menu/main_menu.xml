@@ -7,6 +7,11 @@
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/account_settings"/>
     <item
+        android:id="@+id/menu_find_friends_btn"
+        android:icon="@drawable/friends"
+        android:title="@string/find_friends"
+        />
+    <item
         android:id="@+id/menu_chat_room_btn"
         android:icon="@drawable/icon_chat_room"
         android:title="@string/chat_room" />

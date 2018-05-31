@@ -42,4 +42,3 @@
 </android.support.constraint.ConstraintLayout>
 
 
-   app/src/main/AndroidManifest.xml app/src/main/java/com/example/dell/pegion/AccountSettingsActivity.java app/src/main/java/com/example/dell/pegion/AllUserActivity.java app/src/main/java/com/example/dell/pegion/RegisterActivity.java app/src/main/java/com/example/dell/pegion/UserViewHolder.java app/src/main/java/com/example/dell/pegion/models/User.java app/src/main/res/layout/activity_all_user.xml app/src/main/res/layout/single_user_layout.xml

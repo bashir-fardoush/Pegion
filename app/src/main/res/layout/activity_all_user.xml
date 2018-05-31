@@ -28,7 +28,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/all_users_rv"
         android:layout_width="match_parent"
-        android:layout_height="565dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,3 +40,6 @@
 
 
 </android.support.constraint.ConstraintLayout>
+
+
+   app/src/main/AndroidManifest.xml app/src/main/java/com/example/dell/pegion/AccountSettingsActivity.java app/src/main/java/com/example/dell/pegion/AllUserActivity.java app/src/main/java/com/example/dell/pegion/RegisterActivity.java app/src/main/java/com/example/dell/pegion/UserViewHolder.java app/src/main/java/com/example/dell/pegion/models/User.java app/src/main/res/layout/activity_all_user.xml app/src/main/res/layout/single_user_layout.xml

@@ -163,8 +163,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                // String nullValue = null;
                 HashMap<String, String> userMap = new HashMap<>();
                 userMap.put("name",name);
-                userMap.put("imageUrl",null);
-                userMap.put("thumbImageUrl",null);
+                userMap.put("imageUrl","link");/*as firebase does not store null value*/
+                userMap.put("thumbImageUrl","link");
                 userMap.put("status","Hi, i am using Pegion");
 
                 reference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {

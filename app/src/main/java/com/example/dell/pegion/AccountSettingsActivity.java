@@ -126,7 +126,8 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
     private void updateUI(String userName, String userStatus,String profileImageUrl) {
         userNameTV.setText(userName);
         userStatusTV.setText(userStatus);
-        if (profileImageUrl != null){
+
+        if (profileImageUrl != "link"){
             Picasso.get().load(profileImageUrl).into(profileIV);
         }
 
@@ -310,11 +311,11 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
 
     private void saveUriInDatabase(String profileDownloadUrl,String thumbDownloadUri) {
 
-        Map<String,String> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
         map.put("imageUrl",profileDownloadUrl);
         map.put("thumbImageUrl",thumbDownloadUri);
 
-        childReference.setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+        childReference.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 

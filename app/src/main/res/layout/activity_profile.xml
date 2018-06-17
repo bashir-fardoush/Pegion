@@ -1,10 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.dell.pegion.models.ProfileActivity">
+    android:orientation="vertical"
+    android:layout_margin="8dp"
+    tools:context="com.example.dell.pegion.ProfileActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <ImageView
+        android:id="@+id/user_iv"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:src="@drawable/default_person_image"/>
+    <TextView
+        android:id="@+id/user_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/user_name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"/>
+    <TextView
+        android:id="@+id/user_status_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/user_status_default_text"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp">
+        <TextView
+            android:id="@+id/fnd_since_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="friend since"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/friend_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/friends"
+            />
+        <Button
+            android:id="@+id/decline_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/decline"
+            android:layout_marginTop="5dp"/>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

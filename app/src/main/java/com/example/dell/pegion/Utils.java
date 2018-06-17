@@ -5,6 +5,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by DELL on 5/4/2018.
  */
@@ -22,4 +25,12 @@ public class Utils {
         isConnected = networkInfo!=null && networkInfo.isConnectedOrConnecting();
         return isConnected;
     }
+    public static  String getCurrentTime(){
+        long  millis = Calendar.getInstance().getTimeInMillis();
+        SimpleDateFormat  dateFormat = new SimpleDateFormat("dd-mm-yyyy hh:mm a");
+
+        return dateFormat.format(millis);
+    }
+
+
 }

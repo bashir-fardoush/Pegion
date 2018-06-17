@@ -66,6 +66,17 @@ public class AllUserActivity extends AppCompatActivity {
                 viewHolder.setUserName(model.getName());
                 viewHolder.setUserStatus(model.getStatus());
                 viewHolder.setUserImage(model.getThumbImageUrl(),AllUserActivity.this);
+                View view = viewHolder.view;
+
+                final String userId =  getRef(position).getKey();
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       Intent profileIntent = new Intent(AllUserActivity.this,ProfileActivity.class);
+                       profileIntent.putExtra("userId",userId);
+                       startActivity(profileIntent);
+                    }
+                });
 
             }
         };

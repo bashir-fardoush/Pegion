@@ -17,7 +17,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class UserViewHolder extends RecyclerView.ViewHolder {
-    public View view;
+   public View view;
    public CircleImageView thumIV;
    public TextView nameTV;
    public TextView statusTV;

@@ -37,6 +37,8 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -84,6 +86,7 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
         userId = user.getUid();
         parentReference = FirebaseDatabase.getInstance().getReference();
         childReference = parentReference.child("users").child(userId);
+        childReference.keepSynced(true);
 
         profileImageRef = FirebaseStorage.getInstance().getReference();
 
@@ -101,11 +104,10 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
         progressDialog.setMessage("Please wait while uploading image...");
         progressDialog.setIndeterminate(true);
         progressDialog.setCanceledOnTouchOutside(true);
+        loadingProgressBar = new ContentLoadingProgressBar(this);
 
-
-            loadingProgressBar = new ContentLoadingProgressBar(this);
-
-
+            progressDialog.setMessage("Please wait while loading data...");
+            progressDialog.show();
             childReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,16 +121,39 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("settings_dataload","failed");
+                progressDialog.dismiss();
             }
         });
     }
 
-    private void updateUI(String userName, String userStatus,String profileImageUrl) {
+    private void updateUI(String userName, String userStatus, final String profileImageUrl) {
         userNameTV.setText(userName);
         userStatusTV.setText(userStatus);
 
         if (profileImageUrl != "link"){
-            Picasso.get().load(profileImageUrl).into(profileIV);
+         //   Picasso.get().load(profileImageUrl).placeholder(R.drawable.default_person_image).into(profileIV);
+            Picasso.get().load(profileImageUrl).networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(R.drawable.default_person_image).into(profileIV, new Callback() {
+                @Override
+                public void onSuccess() {
+                    //offline load succeed
+                    progressDialog.dismiss();
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    /*need to load online*/
+                    Log.e(TAG,"offline loading failed: "+e.getMessage());
+                    Toast.makeText(AccountSettingsActivity.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                    if (!Utils.isConnected(AccountSettingsActivity.this)){
+                        progressDialog.dismiss();
+                        return;
+                    }
+
+                    Picasso.get().load(profileImageUrl).placeholder(R.drawable.default_person_image).into(profileIV);
+
+                }
+            });
         }
 
 
@@ -270,7 +295,7 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
            return;
         }
 
-
+        progressDialog.setMessage("Please wait while uploading image...");
         progressDialog.show();
         final StorageReference profileImagePath = profileImageRef.child("pegion").child(userId).child("profile_images").child("profile_image.jpg");
         final StorageReference profileThumbImagePath = profileImageRef.child("pegion").child(userId).child("profile_images").child("thumb_image.jpg");
@@ -339,5 +364,9 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

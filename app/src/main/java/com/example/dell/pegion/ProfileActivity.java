@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView userIV;
     private TextView userNameTV,userStatusTV,fndSinceTV;
     private Button friendBtn,declineBtn;
+    private LinearLayout fndFeatureLayout;
 
     private String TAG = "tag_ProfileActivity";
     private String name,status,profileImageUrl;
@@ -54,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         fndSinceTV = findViewById(R.id.fnd_since_tv);
         friendBtn = findViewById(R.id.friend_btn);
         declineBtn = findViewById(R.id.decline_btn);
+        fndFeatureLayout = findViewById(R.id.fnd_feature_linearLayout);
 
         fndSinceTV.setVisibility(View.GONE);
         friendBtn.setOnClickListener(this);
@@ -65,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                name = dataSnapshot.child("name").getValue(String.class);
                 status = dataSnapshot.child("status").getValue(String.class);
                 profileImageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
 
@@ -105,6 +109,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         declineBtn.setText(R.string.decline_friend_request);
                     }
                 }else {
+                    declineBtn.setVisibility(View.GONE);
                    /*default */
                 }
                // Log.d(TAG,"request type retrived");
@@ -128,6 +133,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                    // declineBtn.setVisibility(View.VISIBLE);
                     fndSinceTV.setText("Friend Since: "+friendSince);
                     fndSinceTV.setVisibility(View.VISIBLE);
+                    declineBtn.setVisibility(View.GONE);
                 }
             }
 
@@ -136,6 +142,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG,"friend since data retrive error: "+databaseError.getMessage());
             }
         });
+
+
+
+
+        if(userID.equals(current_userId)){
+            fndFeatureLayout.setVisibility(View.INVISIBLE);
+        }
+
 
     }
 

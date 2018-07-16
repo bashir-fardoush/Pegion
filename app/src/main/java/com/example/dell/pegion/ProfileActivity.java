@@ -23,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView userIV;
@@ -37,17 +39,23 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private DatabaseReference reference;
     private DatabaseReference fndReqRef;
     private DatabaseReference fndRef;
+    private DatabaseReference notificationRef;
     private String current_userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+
+
          userID = getIntent().getStringExtra("userId");
         //Toast.makeText(this, ""+userID, Toast.LENGTH_SHORT).show();
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
         fndReqRef = FirebaseDatabase.getInstance().getReference().child("friends_req");
         fndRef = FirebaseDatabase.getInstance().getReference().child("friends");
+        notificationRef = FirebaseDatabase.getInstance().getReference().child("notification");
+
         current_userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
          userIV = findViewById(R.id.user_iv);
@@ -175,12 +183,27 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                       if(task.isSuccessful()){
+
+                                                          HashMap<String, String> notificationData = new HashMap<>();
+                                                          notificationData.put("from",current_userId);
+                                                          notificationData.put("type",getString(R.string.request));
+
+                                                          notificationRef.child(userID).push().setValue(notificationData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                              @Override
+                                                              public void onComplete(@NonNull Task<Void> task) {
+                                                             if (task.isSuccessful()){
+                                                                 Log.d(TAG,"notification data saved successfully");
+                                                             }
+
+                                                              }
+                                                          });
+
                                                             Toast.makeText(ProfileActivity.this, "Request sent Successfully", Toast.LENGTH_SHORT).show();
                                                             friendBtn.setEnabled(true);
                                                             friendBtn.setText(R.string.cancel_friend_request);
                                                         }else{
                                                           friendBtn.setEnabled(true);
-                                                          Log.d(TAG,"Request send failed2");
+                                                          Log.d(TAG,"Failed to save request data to receiver");
                                                           Toast.makeText(ProfileActivity.this, "Request sent failed", Toast.LENGTH_SHORT).show();
                                                         }
 

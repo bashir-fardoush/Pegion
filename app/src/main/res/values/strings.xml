@@ -31,5 +31,8 @@
     <string name="cancel_friend_request">Cancel Friend Request</string>
     <string name="accept_friend_request">Accept Friend Request</string>
     <string name="decline_friend_request">Decline Friend Request</string>
+    <string name="request">request</string>
+    <string name="channel_name">Friend Request</string>
+    <string name="channel_description">Notifications of Friend Requests</string>
 
 </resources>

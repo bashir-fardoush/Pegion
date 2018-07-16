@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity {
         if(user == null){
            sendToLogIn(true);
         }else if (!user.isEmailVerified()){
-           sendToRegister(true);
+          // sendToRegister(true);
         }else {
 
         }

@@ -175,7 +175,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             registerProgressdialog.dismiss();
                             Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
                             Log.d("userID",mAuth.getCurrentUser().getUid());
-                            verifyUserEmail();
+                           // verifyUserEmail();
+                            /*Continue with un verified email*/
+                            mAuth.signOut();
+                            startActivity(new Intent(RegisterActivity.this, LogInActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                         }
                         else {
                             Toast.makeText(RegisterActivity.this, "failed to store info", Toast.LENGTH_LONG).show();

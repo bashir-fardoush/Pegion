@@ -1,6 +1,7 @@
 package com.example.dell.pegion;
 
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,6 +42,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private DatabaseReference fndReqRef;
     private DatabaseReference fndRef;
     private DatabaseReference notificationRef;
+    private DatabaseReference rootRef;
     private String current_userId;
 
     @Override
@@ -51,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
          userID = getIntent().getStringExtra("userId");
         //Toast.makeText(this, ""+userID, Toast.LENGTH_SHORT).show();
+        rootRef = FirebaseDatabase.getInstance().getReference();
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(userID);
         fndReqRef = FirebaseDatabase.getInstance().getReference().child("friends_req");
         fndRef = FirebaseDatabase.getInstance().getReference().child("friends");
@@ -168,161 +172,112 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         switch (v.getId()){
-
             case R.id.friend_btn:
                 friendBtn.setEnabled(false);
                 if (requestTypeCode == 0){/*not friend , have to send friend request*/
-                    fndReqRef.child(current_userId).child(userID).child("request_type").setValue(1)//sent
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
 
-                                        fndReqRef.child(userID).child(current_userId).child("request_type").setValue(2)/*received*/
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                      if(task.isSuccessful()){
+                    DatabaseReference notificaitonReference = notificationRef.child(userID).push();
+                    String Notificationkey = notificaitonReference.getKey();
+                    HashMap<String ,String> notificationDataMap= new HashMap<>();
+                    notificationDataMap.put("from",current_userId);
+                    notificationDataMap.put("type","request");
 
-                                                          HashMap<String, String> notificationData = new HashMap<>();
-                                                          notificationData.put("from",current_userId);
-                                                          notificationData.put("type",getString(R.string.request));
+                    Map requestMap = new HashMap<>();
+                    requestMap.put("friends_req/"+current_userId+"/"+userID+"/request_type",1);
+                    requestMap.put("friends_req/"+userID+"/"+current_userId+"/request_type",2);
+                    requestMap.put("notification/"+userID+"/"+Notificationkey,notificationDataMap);
 
-                                                          notificationRef.child(userID).push().setValue(notificationData).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                              @Override
-                                                              public void onComplete(@NonNull Task<Void> task) {
-                                                             if (task.isSuccessful()){
-                                                                 Log.d(TAG,"notification data saved successfully");
-                                                             }
+                    rootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                                                              }
-                                                          });
+                            if (databaseError != null){
+                                Log.d(TAG, "friend request freature: "+databaseError.getMessage());
+                                Toast.makeText(ProfileActivity.this, "Request sent failed,There was a problem", Toast.LENGTH_LONG).show();
+                            }else {
+                                Toast.makeText(ProfileActivity.this, "Request sent Successfully", Toast.LENGTH_SHORT).show();
+                                friendBtn.setText(R.string.cancel_friend_request);
+                            }
+                            friendBtn.setEnabled(true);
+                        }
+                    });
 
-                                                            Toast.makeText(ProfileActivity.this, "Request sent Successfully", Toast.LENGTH_SHORT).show();
-                                                            friendBtn.setEnabled(true);
-                                                            friendBtn.setText(R.string.cancel_friend_request);
-                                                        }else{
-                                                          friendBtn.setEnabled(true);
-                                                          Log.d(TAG,"Failed to save request data to receiver");
-                                                          Toast.makeText(ProfileActivity.this, "Request sent failed", Toast.LENGTH_SHORT).show();
-                                                        }
 
-                                                    }
-                                                });
-                                    }else {
-                                        Toast.makeText(ProfileActivity.this, "Request send failed", Toast.LENGTH_SHORT).show();
-                                        Log.d(TAG,"Request send failed");
-                                        friendBtn.setEnabled(true);
-                                    }
-                                }
-                            });
+
                 }else if(requestTypeCode == 1){/*friend request sent have to cancel friend request*/
-                    fndReqRef.child(current_userId).child(userID).child("request_type").removeValue()
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        fndReqRef.child(userID).child(current_userId).child("request_type").removeValue()
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()){
-                                                            Toast.makeText(ProfileActivity.this, "Request Canceled", Toast.LENGTH_LONG).show();
-                                                           // friendBtn.setText(R.string.send_friend_request);
-                                                           // requestTypeCode = 0;
-                                                        }else {
-                                                            Toast.makeText(ProfileActivity.this, "Request Cancel failed", Toast.LENGTH_LONG).show();
-                                                        }
-                                                        friendBtn.setText(R.string.send_friend_request);
-                                                        requestTypeCode = 0;
-                                                        friendBtn.setEnabled(true);
+                    Map map = new HashMap<>();
+                    map.put("friends_req/"+current_userId+"/"+userID+"/request_type",null);
+                    map.put("friends_req/"+userID+"/"+current_userId+"/request_type",null);
+                   // requestMap.put("notification/"+userID+"/"+Notificationkey,notificationDataMap);
+                    rootRef.updateChildren(map, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError != null){
+                                Log.d(TAG, "cancel request freature: "+databaseError.getMessage());
+                                Toast.makeText(ProfileActivity.this, "Can't cancel request now, There was a problem", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(ProfileActivity.this, "Request canceled successfully", Toast.LENGTH_SHORT).show();
+                                friendBtn.setText(R.string.send_friend_request);
+                                requestTypeCode = 0;
+                            }
 
-                                                    }
-                                                });
-                                    }else {
-                                        Toast.makeText(ProfileActivity.this, "Request Cancel failed", Toast.LENGTH_LONG).show();
-                                        Log.d(TAG,"Request Cancel failed");
-                                        friendBtn.setEnabled(true);
-                                    }
-                                }
-                            });
+                            friendBtn.setEnabled(true);
+
+                        }
+                    });
+
 
                 }else if(requestTypeCode == 2){/*friend request received have to accept friend request*/
-                    fndReqRef.child(current_userId).child(userID).child("request_type").removeValue()
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        fndReqRef.child(userID).child(current_userId).child("request_type").removeValue()
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()){
-                                                         //   Toast.makeText(ProfileActivity.this, "Request Canceled", Toast.LENGTH_LONG).show();
-                                                            // friendBtn.setText(R.string.send_friend_request);
-                                                             requestTypeCode = 3;
-                                                        }else {
-                                                           // Toast.makeText(ProfileActivity.this, "Request Cancel failed", Toast.LENGTH_LONG).show();
-                                                        }
-                                                       // friendBtn.setText(R.string.send_friend_request);
-                                                        requestTypeCode = 0;
-                                                    //    friendBtn.setEnabled(true);
 
-                                                    }
-                                                });
-                                    }else {
-                                       // Toast.makeText(ProfileActivity.this, "Request Cancel failed", Toast.LENGTH_LONG).show();
-                                       // friendBtn.setEnabled(true);
-                                    }
+                    String time = Utils.getCurrentTime();
 
-                                }
-                            });
-                   final String time = Utils.getCurrentTime();
-                    fndRef.child(current_userId).child(userID).child("friends_since").setValue(time)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        fndRef.child(userID).child(current_userId).child("friends_since").setValue(time).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> innerTask) {
-                                                if (!innerTask.isSuccessful()){
-                                                    Log.d(TAG,"Other side didn't get accepted");
-                                                }
-                                            }
-                                        });
+                    Map map = new HashMap<>();
+                    map.put("friends_req/"+current_userId+"/"+userID+"/request_type",null);
+                    map.put("friends_req/"+userID+"/"+current_userId+"/request_type",null);
+                    map.put("friends/"+current_userId+"/"+userID+"/friends_since",time);
+                    map.put("friends/"+userID+"/"+current_userId+"/friends_since",time);
 
-                                        Toast.makeText(ProfileActivity.this, "Hurrah! You are friends Now", Toast.LENGTH_LONG).show();
-                                        requestTypeCode = 3;
-                                        friendBtn.setText(R.string.unfirend);
-                                        declineBtn.setVisibility(View.GONE);
+                    rootRef.updateChildren(map, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError != null){
+                                Log.d(TAG, "request accept freature: "+databaseError.getMessage());
+                                Toast.makeText(ProfileActivity.this, "Can't accept request now, There was a problem", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(ProfileActivity.this, "Hurrah! You are friends Now", Toast.LENGTH_LONG).show();
+                                requestTypeCode = 3;
+                                friendBtn.setText(R.string.unfirend);
+                                declineBtn.setVisibility(View.GONE);
+                            }
 
-                                    }else {
-                                        Toast.makeText(ProfileActivity.this, "Can't be friends now", Toast.LENGTH_SHORT).show();
-                                    }
+                            friendBtn.setEnabled(true);
+                        }
+                    });
 
-                                    friendBtn.setEnabled(true);
-                                }
-                            });
-                }else if (requestTypeCode == 3){/*firends make unfriend now*/
-                    fndRef.child(current_userId).child(userID).child("friends_since").removeValue()
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        Toast.makeText(ProfileActivity.this, "Successfull unfriend", Toast.LENGTH_SHORT).show();
-                                        requestTypeCode = 0;
-                                        friendBtn.setText(R.string.send_friend_request);
-                                        declineBtn.setVisibility(View.GONE);
-                                        fndSinceTV.setText("friend since");
-                                        fndSinceTV.setVisibility(View.GONE);
+                }else if (requestTypeCode == 3){/*firends, make unfriend now*/
 
-                                    }else {
-                                        Toast.makeText(ProfileActivity.this, "Unable to unfriend now", Toast.LENGTH_SHORT).show();
-                                    }
-                                    friendBtn.setEnabled(true);
-                                }
-                            });
+                    Map map = new HashMap<>();
+                    map.put("friends/"+current_userId+"/"+userID+"/friends_since",null);
+
+                    rootRef.updateChildren(map, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError != null){
+                                Log.d(TAG, "unfriend freature: "+databaseError.getMessage());
+                                Toast.makeText(ProfileActivity.this, "Can't unfriend now, There was a problem", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(ProfileActivity.this, "Successfully unfriend", Toast.LENGTH_SHORT).show();
+                                requestTypeCode = 0;
+                                friendBtn.setText(R.string.send_friend_request);
+                                declineBtn.setVisibility(View.GONE);
+                                fndSinceTV.setText("friend since");
+                                fndSinceTV.setVisibility(View.GONE);
+                            }
+                            friendBtn.setEnabled(true);
+                        }
+                    });
+
+
                 }
 
 
